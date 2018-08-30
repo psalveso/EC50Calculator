@@ -18,6 +18,7 @@ parser.add_argument("-2", "--dataset2", help="Name of samples in columns 4, 5, a
 parser.add_argument("-3", "--dataset3", help="Name of samples in columns 7, 8, and 9", default="data set 3", dest="dataSet3Name")
 parser.add_argument("-4", "--dataset4", help="Name of samples in columns 10, 11, and 12", default="data set 4", dest="dataSet4Name")
 parser.add_argument("-n", "--hill", help="Fit Hill coefficient? True or False", default=False, dest="hill")
+parser.add_argument("-i", "--input", help="Input data file name", default="data.txt", dest="datafile")
 args = parser.parse_args()
 
 # Calculated based on user input
@@ -32,7 +33,7 @@ params.add('EC50', value=0.004, min=0.0000001)
 # This function removes the annoying non UTF-* character in the raw data file
 def simplifyInputFile():
 
-    finput = os.path.join(__location__, 'workdir/data.txt')
+    finput = os.path.join(__location__, args.datafile)
     foutput = os.path.join(__location__, 'workdir/data_editted.txt')
     with open(finput, 'rb') as f:
         with open(foutput, 'w') as x:

@@ -11,6 +11,7 @@ The following must be installed on your system to run the script properly
 - Scipy
 - lmfit
 - matplotlib
+- kiwisolver
 
 ## Running the script
 
@@ -38,12 +39,13 @@ The script should handle `.txt` files output by INSTRUMENT NAME, wherein data is
 
 ### Running the script from the terminal
 
-After cloning/forking/downloading the repository, you first need to place your data file output by the INSTRUMENT NAME into the `workdir` directory. Then navigate to the directory that contains the script using a terminal.
+After cloning/forking/downloading the repository, you first need to place your data file output by the INSTRUMENT NAME into the same directory as the script. Then navigate to the directory that contains the script using a terminal.
 
 The script is run by entering `python3 EC50.py`.
 
 You have the option of specifying several parameters for the script using flags when you run it. These flags are:
 
+- `-i` This specifies the input data file name.
 - `-d` This specifies the dilution factor. It needs to be a number.
 - `-c` This specifies the highest concentration used in the concentration gradient. It needs to be a number.
 - `-s` This specifies the number of samples that the concentration gradient spans. It needs to be a number.
@@ -54,14 +56,17 @@ You have the option of specifying several parameters for the script using flags 
 - `-3` This specifies the name of the third experiment. It needs to be a string.
 - `-4` This specifies the name of the fourth experiment. It needs to be a string.
 
-For example: `python3 EC50.py -d 2 -c 1 -s 8 -a mg/mL -n False -1 CL2A -2 CL1A -3 CL2A_BSA -4 CL1A_BSA`
+For example: `python3 EC50.py -i CL2A_CL1A_BSA.txt -d 2 -c 1 -s 8 -a mg/mL -n False -1 CL2A -2 CL1A -3 CL2A_BSA -4 CL1A_BSA`
 
-This tells the script that there are 8 samples that span from 1 mg/mL to 0.0078125 mg/mL. The fit will treat n fixed to 1. It will then label the figure and output files according to the names CL2A, CL1A, CL2A_BSA, and CL1A_BSA.
+This tells the script that there are 8 samples that span from 1 mg/mL to 0.0078125 mg/mL. The fit will treat n fixed to 1. It will then label the figure and output files according to the names CL2A, CL1A, CL2A_BSA, and CL1A_BSA. The data is located in `CL2A_CL1A_BSA.txt`, which was output by INSTRUMENT NAME.
+
+You can view what these flags are in the terminal by entering `python3 EC50.py -h`.
 
 These flags do not need to be used every time that the script is run. If they are not specified, they will take a default value. The default values set the max concentration to 3 mg/mL and the dilution factor to 3-fold.
 
 | flag | default value |
 | --- | --- |
+| `-i` | `data.txt` |
 | `-d` | 3 |
 | `-c` | 3 |
 | `-s` | 8 |
@@ -79,6 +84,6 @@ You can run less than 8 samples if you would like. In this situation, you need t
 
 ### Output of the script
 
-The script will place four tab-seperated `.txt` files and a `results.pdf` into the `results` directory. The tab-seperated text files can be directly opened in excel. They contain the concentrations, the average absorbance of the three replicates, and the standard deviation of the three replicates for the given experiment. The `.txt` files will also contain the optimized values for the EC50, and A. The `results.pdf` file contains a graph of the normalized data and the normalized fits. They are labeled according to the flags. The `results.pdf` can be loaded into illustrator so that you can change the names or colors of the curves, if you would like.
+The script will place four tab-seperated `.txt` files and a `results.pdf` into the `results` directory. The tab-seperated text files can be directly opened in excel. They contain the concentrations, the average absorbance of the three replicates, and the standard deviation of the three replicates for the given experiment. The `.txt` files will also contain the optimized values for the EC50, A, and n parameters. The `results.pdf` file contains a graph of the normalized data and the normalized fits. They are labeled according to the flags. The `results.pdf` can be loaded into illustrator so that you can change the names or colors of the curves, if you would like.
 
-Once you have finished analyzing your data, you should move all the filed out of  the `results` directory and save them else where on your computer. If not, subsequent runs of the script will overwrite all of the output files. Likewise, you should remove your input data file from `workdir`.
+Once you have finished analyzing your data, you should move all the filed out of  the `results` directory and save them else where on your computer. If not, subsequent runs of the script will overwrite all of the output files.
