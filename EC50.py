@@ -193,9 +193,9 @@ def plotFits(results1, results2, results3, results4, xdata, ydata1, yerr1, ydata
         # Put a legend below current axis
         plt.legend(loc=9, bbox_to_anchor=(0.5, -0.25), ncol=4)
 
-
-
-        plt.savefig(os.path.join(__location__, 'results/results.pdf'), bbox_inches="tight")
+        f = f'results/results_{args.datafile[:-4]}.pdf'
+        
+        plt.savefig(os.path.join(__location__, f), bbox_inches="tight")
 
         # This command causes the plot to load in a different window
         plt.show()
