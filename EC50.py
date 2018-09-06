@@ -129,8 +129,10 @@ def plotFits(results1, results2, results3, results4, xdata, ydata1, yerr1, ydata
     # For ploting the raw data and the fit
     try:
         import matplotlib.pyplot as plt
-        # Normalzied data and normalized fitted curve
-        # These make the fitted curve much smoother
+        # These make editing the text labels in Illustrator much easier
+        plt.rcParams['pdf.fonttype'] = 42
+        plt.rcParams['ps.fonttype'] = 42
+        plt.rcParams["font.family"] = "arial"
 
         # sets up the first sub plot with normal axis
         plt.figure(1)
@@ -196,7 +198,7 @@ def plotFits(results1, results2, results3, results4, xdata, ydata1, yerr1, ydata
 
         f = f'results/results_{args.datafile[:-4]}.pdf'
 
-        plt.savefig(os.path.join(__location__, f), bbox_inches="tight")
+        plt.savefig(os.path.join(__location__, f), bbox_inches="tight", transparent=True)
 
         # This command causes the plot to load in a different window
         plt.show()
