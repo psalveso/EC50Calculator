@@ -115,7 +115,7 @@ def normalizedData(params, data):
     graph = data / A
     return graph
 
-def plotFits(results1, results2, results3, results4, xdata, ydata1, yerr1, ydata2, ydata3, ydata4):
+def plotFits(results1, results2, results3, results4, xdata, ydata1, yerr1, ydata2, ydata3, ydata4, yerr2, yerr3, yerr4):
 
     #gets the optimized paramters, which it needs to normalize data
     optParams1 = results1.params.valuesdict()
@@ -137,23 +137,23 @@ def plotFits(results1, results2, results3, results4, xdata, ydata1, yerr1, ydata
         plt.subplot(211)
 
         # data set 1
-        plt.plot(xdata, normalizedData(optParams1, ydata1), 'b.', label=f'{args.dataSet1Name}')
-        plt.plot(xdataOpt, plotFunc(optParams1, xdataOpt), 'b--', label='fit')
+        plt.errorbar(xdata, normalizedData(optParams1, ydata1), yerr1, fmt='b.')
+        plt.plot(xdataOpt, plotFunc(optParams1, xdataOpt), 'b--')
 
 
         # data set 2
-        plt.plot(xdata, normalizedData(optParams2, ydata2), 'g.', label=f'{args.dataSet2Name}')
-        plt.plot(xdataOpt, plotFunc(optParams2, xdataOpt), 'g--', label='fit')
+        plt.errorbar(xdata, normalizedData(optParams2, ydata2), yerr2, fmt='g.',)
+        plt.plot(xdataOpt, plotFunc(optParams2, xdataOpt), 'g--')
 
 
         # data set 3
-        plt.plot(xdata, normalizedData(optParams3, ydata3), 'r.', label=f'{args.dataSet3Name}')
-        plt.plot(xdataOpt, plotFunc(optParams3, xdataOpt), 'r--', label='fit')
+        plt.errorbar(xdata, normalizedData(optParams3, ydata3), yerr3, fmt='r.')
+        plt.plot(xdataOpt, plotFunc(optParams3, xdataOpt), 'r--')
 
 
         # data set 4
-        plt.plot(xdata, normalizedData(optParams4, ydata4), 'k.', label=f'{args.dataSet4Name}')
-        plt.plot(xdataOpt, plotFunc(optParams4, xdataOpt), 'k--', label='fit')
+        plt.errorbar(xdata, normalizedData(optParams4, ydata4), yerr4, fmt='k.')
+        plt.plot(xdataOpt, plotFunc(optParams4, xdataOpt), 'k--')
 
 
         plt.ylabel("normalized absorbance")
@@ -164,24 +164,25 @@ def plotFits(results1, results2, results3, results4, xdata, ydata1, yerr1, ydata
         plt.figure(1)
         plt.subplot(212)
 
+        # Normalized data with error bars
         # data set 1
-        plt.plot(xdata, normalizedData(optParams1, ydata1), 'b.', label=f'{args.dataSet1Name}')
-        plt.plot(xdataOpt, plotFunc(optParams1, xdataOpt), 'b--', label=f'fit\nEC50: {round(optParams1["EC50"],4)} {args.axis}')
-
-
+        plt.errorbar(xdata, normalizedData(optParams1, ydata1), yerr1, fmt='b.')
         # data set 2
-        plt.plot(xdata, normalizedData(optParams2, ydata2), 'g.', label=f'{args.dataSet2Name}')
-        plt.plot(xdataOpt, plotFunc(optParams2, xdataOpt), 'g--', label=f'fit\nEC50: {round(optParams2["EC50"],4)} {args.axis}')
-
-
+        plt.errorbar(xdata, normalizedData(optParams2, ydata2), yerr2, fmt='g.')
         # data set 3
-        plt.plot(xdata, normalizedData(optParams3, ydata3), 'r.', label=f'{args.dataSet3Name}')
-        plt.plot(xdataOpt, plotFunc(optParams3, xdataOpt), 'r--', label=f'fit\nEC50: {round(optParams3["EC50"],4)} {args.axis}')
-
-
+        plt.errorbar(xdata, normalizedData(optParams3, ydata3), yerr3, fmt='r.')
         # data set 4
-        plt.plot(xdata, normalizedData(optParams4, ydata4), 'k.', label=f'{args.dataSet4Name}')
-        plt.plot(xdataOpt, plotFunc(optParams4, xdataOpt), 'k--', label=f'fit\nEC50: {round(optParams4["EC50"], 4)} {args.axis}')
+        plt.errorbar(xdata, normalizedData(optParams4, ydata4), yerr4, fmt='k.')
+
+        # Fitted curves
+        # data set 1
+        plt.plot(xdataOpt, plotFunc(optParams1, xdataOpt), 'b--', label=f'{args.dataSet1Name}\nEC50: {round(optParams1["EC50"],4)} {args.axis}')
+        # data set 2
+        plt.plot(xdataOpt, plotFunc(optParams2, xdataOpt), 'g--', label=f'{args.dataSet2Name}\nEC50: {round(optParams2["EC50"],4)} {args.axis}')
+        # data set 3
+        plt.plot(xdataOpt, plotFunc(optParams3, xdataOpt), 'r--', label=f'{args.dataSet3Name}\nEC50: {round(optParams3["EC50"],4)} {args.axis}')
+        # data set 4
+        plt.plot(xdataOpt, plotFunc(optParams4, xdataOpt), 'k--', label=f'{args.dataSet4Name}\nEC50: {round(optParams4["EC50"], 4)} {args.axis}')
 
         plt.xscale('log')
         plt.xlabel(args.axis)
@@ -191,10 +192,10 @@ def plotFits(results1, results2, results3, results4, xdata, ydata1, yerr1, ydata
         #box = ax.get_position()
         #ax.set_position([box.x0, box.y0 + box.height * 0.1, box.width, box.height * 0.9])
         # Put a legend below current axis
-        plt.legend(loc=9, bbox_to_anchor=(0.5, -0.25), ncol=4)
+        plt.legend(loc=9, bbox_to_anchor=(0.5, -0.25), ncol=2)
 
         f = f'results/results_{args.datafile[:-4]}.pdf'
-        
+
         plt.savefig(os.path.join(__location__, f), bbox_inches="tight")
 
         # This command causes the plot to load in a different window
@@ -264,4 +265,4 @@ if __name__ == '__main__':
     outputEC50Table(EC50s)
 
     # generates plot and saves pdf version of plot
-    plotFits(result1, result2, result3, result4, ds1[:,0], ds1[:,1], ds1[:,2], ds2[:,1], ds3[:,1], ds4[:,1])
+    plotFits(result1, result2, result3, result4, ds1[:,0], ds1[:,1], ((ds1[:,2]/ds1[:,1])*(ds1[:,1]/result1.params.valuesdict()['max'])), ds2[:,1], ds3[:,1], ds4[:,1], ((ds2[:,2]/ds2[:,1])*(ds2[:,1]/result2.params.valuesdict()['max'])), ((ds3[:,2]/ds3[:,1])*(ds3[:,1]/result3.params.valuesdict()['max'])), ((ds4[:,2]/ds4[:,1])*(ds4[:,1]/result4.params.valuesdict()['max'])))

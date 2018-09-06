@@ -1,6 +1,6 @@
 # EC50 Calculator
 
-This python script calculates EC50 values for the affinity of antibody sera towards an antigen. The script reads a `.txt` file produced by INSTRUMENT NAME and performs a nonlinear least squares fit of the data sets within. The script outputs the results of the fits as text files and saves a graph of the results to a pdf file.
+This python script calculates EC50 values for the affinity of antibody sera towards an antigen. The script reads a `.txt` file produced by Varioskan Lux and performs a nonlinear least squares fit of the data sets within. The script outputs the results of the fits as text files and saves a graph of the results to a pdf file.
 
 ## Dependencies
 
@@ -17,7 +17,7 @@ The following must be installed on your system to run the script properly
 
 ### Formatting input data
 
-The script should handle `.txt` files output by INSTRUMENT NAME, wherein data is places in a tab-seperated text file mimicking the layout of a 96-well plate. **Your 96-well plate needs to be laid out in a particular way for the script to work.**
+The script should handle `.txt` files output by Varioskan Lux, wherein data is places in a tab-seperated text file mimicking the layout of a 96-well plate. The script will work with data outputted from Skanit Software 5.0, using the default export options. Prior to outputting the data from the instrument, it is critical that **your 96-well plate be laid out in a particular way for the script to work.**
 
 
 | - | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 |
@@ -39,7 +39,7 @@ The script should handle `.txt` files output by INSTRUMENT NAME, wherein data is
 
 ### Running the script from the terminal
 
-After cloning/forking/downloading the repository, you first need to place your data file output by the INSTRUMENT NAME into the same directory as the script. Then navigate to the directory that contains the script using a terminal.
+After cloning/forking/downloading the repository, you first need to place your data file output by the Varioskan Lux into the same directory as the script. Then navigate to the directory that contains the script using a terminal.
 
 The script is run by entering `python3 EC50.py`.
 
@@ -58,7 +58,7 @@ You have the option of specifying several parameters for the script using flags 
 
 For example: `python3 EC50.py -i CL2A_CL1A_BSA.txt -d 2 -c 1 -s 8 -a mg/mL -n False -1 CL2A -2 CL1A -3 CL2A_BSA -4 CL1A_BSA`
 
-This tells the script that there are 8 samples that span from 1 mg/mL to 0.0078125 mg/mL. The fit will treat n fixed to 1. It will then label the figure and output files according to the names CL2A, CL1A, CL2A_BSA, and CL1A_BSA. The data is located in `CL2A_CL1A_BSA.txt`, which was output by INSTRUMENT NAME.
+This tells the script that there are 8 samples that span from 1 mg/mL to 0.0078125 mg/mL. The fit will treat n fixed to 1. It will then label the figure and output files according to the names CL2A, CL1A, CL2A_BSA, and CL1A_BSA. The data is located in `CL2A_CL1A_BSA.txt`, which was output by Varioskan Lux.
 
 You can view what these flags are in the terminal by entering `python3 EC50.py -h`.
 
@@ -84,6 +84,6 @@ You can run less than 8 samples if you would like. In this situation, you need t
 
 ### Output of the script
 
-The script will place five tab-seperated `.txt` files and a `results.pdf` into the `results` directory. The tab-seperated text files can be directly opened in excel. Four of the five `.txt` files contain the concentrations, the average absorbance of the three replicates, and the standard deviation of the three replicates for the given experiment. These `.txt` files also contain the optimized values for the EC50, A, and n parameters. the fifth `.txt` file contains a table of the four fitted EC50 values. The `results.pdf` file contains two graphs of the normalized data and the normalized fits: one with a log scale x-axis and one without. The legend for these graphs contains the fitted EC50 values, rounded to 4 significant figures. The legends are labeled according to the `-1`, `-2`, `-3`, and `-4`  flags. The `results.pdf` can be loaded into illustrator so that you can change the names or colors of the curves, if you would like.
+The script will place five tab-seperated `.txt` files and a `results.pdf` into the `results` directory. The tab-seperated text files can be directly opened in excel. Four of the five `.txt` files contain the concentrations, the average absorbance of the three replicates, and the standard deviation of the three replicates for the given experiment. These `.txt` files also contain the optimized values for the EC50, A, and n parameters. the fifth `.txt` file contains a table of the four fitted EC50 values. The `results.pdf` file contains two graphs of the normalized data and the normalized fits: one with a log scale x-axis and one without. Both graphs include the normalized error, which is propagated from the standard deviation of the three replicate measurements. The legend for these graphs contains the fitted EC50 values, rounded to 4 significant figures. The legends are labeled according to the `-1`, `-2`, `-3`, and `-4`  flags. The `results.pdf` can be loaded into illustrator so that you can change the names or colors of the curves, if you would like.
 
 Once you have finished analyzing your data, you should move all the files out of  the `results` directory and save them else where on your computer. If not, subsequent runs of the script will overwrite all of the output files.
