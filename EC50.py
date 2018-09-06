@@ -132,6 +132,10 @@ def plotFits(results1, results2, results3, results4, xdata, ydata1, yerr1, ydata
         # Normalzied data and normalized fitted curve
         # These make the fitted curve much smoother
 
+        # sets up the first sub plot with normal axis
+        plt.figure(1)
+        plt.subplot(211)
+
         # data set 1
         plt.plot(xdata, normalizedData(optParams1, ydata1), 'b.', label=f'{args.dataSet1Name}')
         plt.plot(xdataOpt, plotFunc(optParams1, xdataOpt), 'b--', label='fit')
@@ -152,14 +156,46 @@ def plotFits(results1, results2, results3, results4, xdata, ydata1, yerr1, ydata
         plt.plot(xdataOpt, plotFunc(optParams4, xdataOpt), 'k--', label='fit')
 
 
-        plt.xlabel(args.axis)
         plt.ylabel("normalized absorbance")
-        plt.legend()
+        #plt.legend()
         plt.title("normalized fits")
 
+        # sets up the second sub plot with log axis
+        plt.figure(1)
+        plt.subplot(212)
+
+        # data set 1
+        plt.plot(xdata, normalizedData(optParams1, ydata1), 'b.', label=f'{args.dataSet1Name}')
+        plt.plot(xdataOpt, plotFunc(optParams1, xdataOpt), 'b--', label=f'fit\nEC50: {round(optParams1["EC50"],4)} {args.axis}')
 
 
-        plt.savefig(os.path.join(__location__, 'results/results.pdf'))
+        # data set 2
+        plt.plot(xdata, normalizedData(optParams2, ydata2), 'g.', label=f'{args.dataSet2Name}')
+        plt.plot(xdataOpt, plotFunc(optParams2, xdataOpt), 'g--', label=f'fit\nEC50: {round(optParams2["EC50"],4)} {args.axis}')
+
+
+        # data set 3
+        plt.plot(xdata, normalizedData(optParams3, ydata3), 'r.', label=f'{args.dataSet3Name}')
+        plt.plot(xdataOpt, plotFunc(optParams3, xdataOpt), 'r--', label=f'fit\nEC50: {round(optParams3["EC50"],4)} {args.axis}')
+
+
+        # data set 4
+        plt.plot(xdata, normalizedData(optParams4, ydata4), 'k.', label=f'{args.dataSet4Name}')
+        plt.plot(xdataOpt, plotFunc(optParams4, xdataOpt), 'k--', label=f'fit\nEC50: {round(optParams4["EC50"], 4)} {args.axis}')
+
+        plt.xscale('log')
+        plt.xlabel(args.axis)
+        plt.ylabel("normalized absorbance")
+
+
+        #box = ax.get_position()
+        #ax.set_position([box.x0, box.y0 + box.height * 0.1, box.width, box.height * 0.9])
+        # Put a legend below current axis
+        plt.legend(loc=9, bbox_to_anchor=(0.5, -0.25), ncol=4)
+
+
+
+        plt.savefig(os.path.join(__location__, 'results/results.pdf'), bbox_inches="tight")
 
         # This command causes the plot to load in a different window
         plt.show()
@@ -170,14 +206,26 @@ def plotFits(results1, results2, results3, results4, xdata, ydata1, yerr1, ydata
         pass
 
 
+
+
 # This writes tab deleinated textfiles with the (x, avg, stdev) and optimazed paramters from fit
 def outputFile(dataname, data, resultOfFit):
-    f =f'results/{dataname}_results.txt'
+    f =f'results/{dataname}_results_{args.datafile}'
     filename = os.path.join(__location__, f)
     paramDict = resultOfFit.params.valuesdict()
     myFooterString = f"\nResults from nonlinear regression\nEC50\t{paramDict['EC50']}\nA\t{paramDict['max']}\nHill coefficient\t{paramDict['n']}"
     np.savetxt(filename, data, delimiter='\t', fmt="%s", comments="", header=f"{dataname}\n{args.axis}\taverage abs\tstandard deviation", footer=myFooterString)
     return
+
+
+# This writes the sample name, and EC50 to a tab deleniated textfile.
+def outputEC50Table(dictionaryOfEC50s):
+    f = f'results/EC50Table_{args.datafile}'
+    filename = os.path.join(__location__, f)
+    for key, value in dictionaryOfEC50s.items():
+        with open(filename, 'a') as myfile:
+            myfile.write(f'{key}\t{value}\n')
+
 
 
 
@@ -210,6 +258,10 @@ if __name__ == '__main__':
     outputFile(args.dataSet2Name, ds2, result2)
     outputFile(args.dataSet3Name, ds3, result3)
     outputFile(args.dataSet4Name, ds4, result4)
+
+    # this calls the funtion that writes teh tab delimnated file
+    EC50s = {args.dataSet1Name : result1.params.valuesdict()['EC50'], args.dataSet2Name : result2.params.valuesdict()['EC50'], args.dataSet3Name : result3.params.valuesdict()['EC50'], args.dataSet4Name : result4.params.valuesdict()['EC50']}
+    outputEC50Table(EC50s)
 
     # generates plot and saves pdf version of plot
     plotFits(result1, result2, result3, result4, ds1[:,0], ds1[:,1], ds1[:,2], ds2[:,1], ds3[:,1], ds4[:,1])
