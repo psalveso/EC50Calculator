@@ -216,13 +216,17 @@ def outputFile(plateNumber, dataname, data, resultOfFit):
 
 
 # This writes the sample name, and EC50 to a tab deleniated textfile.
-def outputEC50Table(dictionaryOfEC50s):
+def outputEC50Table(dictionaryOfEC50s, experimentalInfo):
     f = f'results/EC50Table.txt'
     filename = os.path.join(__location__, f)
+    i = 0
     for key, value in dictionaryOfEC50s.items():
         with open(filename, 'a') as myfile:
-            myfile.write(f'{key}\t{value}\n')
-
+            if i > 0:
+                myfile.write(f'\t{key}\t{value}\n')
+            else:
+                myfile.write(f'{experimentalInfo}\t{key}\t{value}\n')
+        i += 1
 
 
 
@@ -273,7 +277,7 @@ if __name__ == '__main__':
 
             # this calls the funtion that writes the tab delimnated file
             EC50s = {fileInfo[2] : result1.params.valuesdict()['EC50'], fileInfo[3] : result2.params.valuesdict()['EC50'], fileInfo[4] : result3.params.valuesdict()['EC50'], fileInfo[5] : result4.params.valuesdict()['EC50']}
-            outputEC50Table(EC50s)
+            outputEC50Table(EC50s, fileInfo[1])
 
             # generates plot and saves pdf version of plot
             plotFits(filename, fileInfo[1], fileInfo[2], fileInfo[3], fileInfo[4], fileInfo[5], result1, result2, result3, result4, ds1[:,0], ds1[:,1], ((ds1[:,2]/ds1[:,1])*(ds1[:,1]/result1.params.valuesdict()['max'])), ds2[:,1], ds3[:,1], ds4[:,1], ((ds2[:,2]/ds2[:,1])*(ds2[:,1]/result2.params.valuesdict()['max'])), ((ds3[:,2]/ds3[:,1])*(ds3[:,1]/result3.params.valuesdict()['max'])), ((ds4[:,2]/ds4[:,1])*(ds4[:,1]/result4.params.valuesdict()['max'])))
@@ -282,38 +286,3 @@ if __name__ == '__main__':
 
         else:
             continue
-
-
-    # parses the data file, loads the data arrays to four numpy arrays
-    #simplifyInputFile()
-    #ds1, ds2, ds3, ds4 = getData(os.path.join(__location__, 'workdir/data_editted.txt'))
-
-    # does the minimization here:
-    # data set 1
-    #mini1 = Minimizer(func, params, fcn_args=(ds1[:,0], ds1[:,1]))
-    #result1 = mini1.minimize()
-
-    # data set 2
-    #mini2 = Minimizer(func, params, fcn_args=(ds2[:,0], ds2[:,1]))
-    #result2 = mini2.minimize()
-
-    # data set 3
-    #mini3 = Minimizer(func, params, fcn_args=(ds3[:,0], ds3[:,1]))
-    #result3 = mini3.minimize()
-
-    # data set 4
-    #mini4 = Minimizer(func, params, fcn_args=(ds4[:,0], ds4[:,1]))
-    #result4 = mini4.minimize()
-
-    # generates output files
-    #outputFile(args.dataSet1Name, ds1, result1)
-    #outputFile(args.dataSet2Name, ds2, result2)
-    #outputFile(args.dataSet3Name, ds3, result3)
-    #outputFile(args.dataSet4Name, ds4, result4)
-
-    # this calls the funtion that writes the tab delimnated file
-    #EC50s = {args.dataSet1Name : result1.params.valuesdict()['EC50'], args.dataSet2Name : result2.params.valuesdict()['EC50'], args.dataSet3Name : result3.params.valuesdict()['EC50'], args.dataSet4Name : result4.params.valuesdict()['EC50']}
-    #outputEC50Table(EC50s)
-
-    # generates plot and saves pdf version of plot
-    #plotFits(result1, result2, result3, result4, ds1[:,0], ds1[:,1], ((ds1[:,2]/ds1[:,1])*(ds1[:,1]/result1.params.valuesdict()['max'])), ds2[:,1], ds3[:,1], ds4[:,1], ((ds2[:,2]/ds2[:,1])*(ds2[:,1]/result2.params.valuesdict()['max'])), ((ds3[:,2]/ds3[:,1])*(ds3[:,1]/result3.params.valuesdict()['max'])), ((ds4[:,2]/ds4[:,1])*(ds4[:,1]/result4.params.valuesdict()['max'])))
