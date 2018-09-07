@@ -13,12 +13,7 @@ parser.add_argument("-d", "--dilution", help="Dilution factor i.e., 2-fold, 3-fo
 parser.add_argument("-c", "--concentation", help="Highest concentration used", default=3, dest="high", type=float)
 parser.add_argument("-s", "--samples", help="Number of samples used", default=8, dest="numSamples", type=int)
 parser.add_argument("-a", "--axis", help="Units of x-axis for graphing", default="mg/mL", dest="axis")
-parser.add_argument("-1", "--dataset1", help="Name of samples in columns 1, 2, and 3", default="data set 1", dest="dataSet1Name")
-parser.add_argument("-2", "--dataset2", help="Name of samples in columns 4, 5, and 6", default="data set 2", dest="dataSet2Name")
-parser.add_argument("-3", "--dataset3", help="Name of samples in columns 7, 8, and 9", default="data set 3", dest="dataSet3Name")
-parser.add_argument("-4", "--dataset4", help="Name of samples in columns 10, 11, and 12", default="data set 4", dest="dataSet4Name")
 parser.add_argument("-n", "--hill", help="Fit Hill coefficient? True or False", default=False, dest="hill")
-parser.add_argument("-i", "--input", help="Input data file name", default="data.txt", dest="datafile")
 args = parser.parse_args()
 
 # Calculated based on user input
@@ -31,11 +26,10 @@ params.add('n', value=1.0, vary=args.hill)
 params.add('EC50', value=0.004, min=0.0000001)
 
 # This function removes the annoying non UTF-* character in the raw data file
-def simplifyInputFile():
+def simplifyInputFile(fileLocation):
 
-    finput = os.path.join(__location__, args.datafile)
     foutput = os.path.join(__location__, 'workdir/data_editted.txt')
-    with open(finput, 'rb') as f:
+    with open(fileLocation, 'rb') as f:
         with open(foutput, 'w') as x:
             try:
                 for line in f:
@@ -115,7 +109,7 @@ def normalizedData(params, data):
     graph = data / A
     return graph
 
-def plotFits(results1, results2, results3, results4, xdata, ydata1, yerr1, ydata2, ydata3, ydata4, yerr2, yerr3, yerr4):
+def plotFits(filename, graphTitle, ds1Name, ds2Name, ds3Name, ds4Name, results1, results2, results3, results4, xdata, ydata1, yerr1, ydata2, ydata3, ydata4, yerr2, yerr3, yerr4):
 
     #gets the optimized paramters, which it needs to normalize data
     optParams1 = results1.params.valuesdict()
@@ -160,7 +154,7 @@ def plotFits(results1, results2, results3, results4, xdata, ydata1, yerr1, ydata
 
         plt.ylabel("normalized absorbance")
         #plt.legend()
-        plt.title("normalized fits")
+        plt.title(f"{graphTitle}\nnormalized fits")
 
         # sets up the second sub plot with log axis
         plt.figure(1)
@@ -178,13 +172,13 @@ def plotFits(results1, results2, results3, results4, xdata, ydata1, yerr1, ydata
 
         # Fitted curves
         # data set 1
-        plt.plot(xdataOpt, plotFunc(optParams1, xdataOpt), 'b--', label=f'{args.dataSet1Name}\nEC50: {round(optParams1["EC50"],4)} {args.axis}')
+        plt.plot(xdataOpt, plotFunc(optParams1, xdataOpt), 'b--', label=f'{ds1Name}\nEC50: {round(optParams1["EC50"],4)} {args.axis}')
         # data set 2
-        plt.plot(xdataOpt, plotFunc(optParams2, xdataOpt), 'g--', label=f'{args.dataSet2Name}\nEC50: {round(optParams2["EC50"],4)} {args.axis}')
+        plt.plot(xdataOpt, plotFunc(optParams2, xdataOpt), 'g--', label=f'{ds2Name}\nEC50: {round(optParams2["EC50"],4)} {args.axis}')
         # data set 3
-        plt.plot(xdataOpt, plotFunc(optParams3, xdataOpt), 'r--', label=f'{args.dataSet3Name}\nEC50: {round(optParams3["EC50"],4)} {args.axis}')
+        plt.plot(xdataOpt, plotFunc(optParams3, xdataOpt), 'r--', label=f'{ds3Name}\nEC50: {round(optParams3["EC50"],4)} {args.axis}')
         # data set 4
-        plt.plot(xdataOpt, plotFunc(optParams4, xdataOpt), 'k--', label=f'{args.dataSet4Name}\nEC50: {round(optParams4["EC50"], 4)} {args.axis}')
+        plt.plot(xdataOpt, plotFunc(optParams4, xdataOpt), 'k--', label=f'{ds4Name}\nEC50: {round(optParams4["EC50"], 4)} {args.axis}')
 
         plt.xscale('log')
         plt.xlabel(args.axis)
@@ -196,7 +190,7 @@ def plotFits(results1, results2, results3, results4, xdata, ydata1, yerr1, ydata
         # Put a legend below current axis
         plt.legend(loc=9, bbox_to_anchor=(0.5, -0.25), ncol=2)
 
-        f = f'results/results_{args.datafile[:-4]}.pdf'
+        f = f'results/results_{filename[:-4]}.pdf'
 
         plt.savefig(os.path.join(__location__, f), bbox_inches="tight", transparent=True)
 
@@ -212,8 +206,8 @@ def plotFits(results1, results2, results3, results4, xdata, ydata1, yerr1, ydata
 
 
 # This writes tab deleinated textfiles with the (x, avg, stdev) and optimazed paramters from fit
-def outputFile(dataname, data, resultOfFit):
-    f =f'results/{dataname}_results_{args.datafile}'
+def outputFile(plateNumber, dataname, data, resultOfFit):
+    f =f'results/{dataname}_results_{plateNumber}.txt'
     filename = os.path.join(__location__, f)
     paramDict = resultOfFit.params.valuesdict()
     myFooterString = f"\nResults from nonlinear regression\nEC50\t{paramDict['EC50']}\nA\t{paramDict['max']}\nHill coefficient\t{paramDict['n']}"
@@ -223,7 +217,7 @@ def outputFile(dataname, data, resultOfFit):
 
 # This writes the sample name, and EC50 to a tab deleniated textfile.
 def outputEC50Table(dictionaryOfEC50s):
-    f = f'results/EC50Table_{args.datafile}'
+    f = f'results/EC50Table.txt'
     filename = os.path.join(__location__, f)
     for key, value in dictionaryOfEC50s.items():
         with open(filename, 'a') as myfile:
@@ -235,36 +229,91 @@ def outputEC50Table(dictionaryOfEC50s):
 # The Fitting script runs in these commands
 if __name__ == '__main__':
 
+    # Loops through all files in input/
+    directory = os.path.join(__location__, "input/")
+    for file in os.listdir(directory):
+        filename = os.fsdecode(file)
+
+        # checks if the file ends with .txt, if so runs the script on it
+        if filename.endswith(".txt"):
+
+            # need to make array from file name
+            fileInfo = filename[:-4].split("_")
+
+            # fileInfo[0] is the plate Number
+            # fileInfo[1] is the experiment information
+            # fileInfo[2] through fileInfo[5] are the experiment names
+
+            # now run through the rest of the parsing and fitting script:
+            simplifyInputFile(os.path.join(directory, filename))
+            ds1, ds2, ds3, ds4 = getData(os.path.join(__location__, 'workdir/data_editted.txt'))
+
+            # does the minimization here:
+            # data set 1
+            mini1 = Minimizer(func, params, fcn_args=(ds1[:,0], ds1[:,1]))
+            result1 = mini1.minimize()
+
+            # data set 2
+            mini2 = Minimizer(func, params, fcn_args=(ds2[:,0], ds2[:,1]))
+            result2 = mini2.minimize()
+
+            # data set 3
+            mini3 = Minimizer(func, params, fcn_args=(ds3[:,0], ds3[:,1]))
+            result3 = mini3.minimize()
+
+            # data set 4
+            mini4 = Minimizer(func, params, fcn_args=(ds4[:,0], ds4[:,1]))
+            result4 = mini4.minimize()
+
+            # generates output files
+            outputFile(fileInfo[0], fileInfo[2], ds1, result1)
+            outputFile(fileInfo[0], fileInfo[3], ds2, result2)
+            outputFile(fileInfo[0], fileInfo[4], ds3, result3)
+            outputFile(fileInfo[0], fileInfo[5], ds4, result4)
+
+            # this calls the funtion that writes the tab delimnated file
+            EC50s = {fileInfo[2] : result1.params.valuesdict()['EC50'], fileInfo[3] : result2.params.valuesdict()['EC50'], fileInfo[4] : result3.params.valuesdict()['EC50'], fileInfo[5] : result4.params.valuesdict()['EC50']}
+            outputEC50Table(EC50s)
+
+            # generates plot and saves pdf version of plot
+            plotFits(filename, fileInfo[1], fileInfo[2], fileInfo[3], fileInfo[4], fileInfo[5], result1, result2, result3, result4, ds1[:,0], ds1[:,1], ((ds1[:,2]/ds1[:,1])*(ds1[:,1]/result1.params.valuesdict()['max'])), ds2[:,1], ds3[:,1], ds4[:,1], ((ds2[:,2]/ds2[:,1])*(ds2[:,1]/result2.params.valuesdict()['max'])), ((ds3[:,2]/ds3[:,1])*(ds3[:,1]/result3.params.valuesdict()['max'])), ((ds4[:,2]/ds4[:,1])*(ds4[:,1]/result4.params.valuesdict()['max'])))
+
+            continue
+
+        else:
+            continue
+
+
     # parses the data file, loads the data arrays to four numpy arrays
-    simplifyInputFile()
-    ds1, ds2, ds3, ds4 = getData(os.path.join(__location__, 'workdir/data_editted.txt'))
+    #simplifyInputFile()
+    #ds1, ds2, ds3, ds4 = getData(os.path.join(__location__, 'workdir/data_editted.txt'))
 
     # does the minimization here:
     # data set 1
-    mini1 = Minimizer(func, params, fcn_args=(ds1[:,0], ds1[:,1]))
-    result1 = mini1.minimize()
+    #mini1 = Minimizer(func, params, fcn_args=(ds1[:,0], ds1[:,1]))
+    #result1 = mini1.minimize()
 
     # data set 2
-    mini2 = Minimizer(func, params, fcn_args=(ds2[:,0], ds2[:,1]))
-    result2 = mini2.minimize()
+    #mini2 = Minimizer(func, params, fcn_args=(ds2[:,0], ds2[:,1]))
+    #result2 = mini2.minimize()
 
     # data set 3
-    mini3 = Minimizer(func, params, fcn_args=(ds3[:,0], ds3[:,1]))
-    result3 = mini3.minimize()
+    #mini3 = Minimizer(func, params, fcn_args=(ds3[:,0], ds3[:,1]))
+    #result3 = mini3.minimize()
 
     # data set 4
-    mini4 = Minimizer(func, params, fcn_args=(ds4[:,0], ds4[:,1]))
-    result4 = mini4.minimize()
+    #mini4 = Minimizer(func, params, fcn_args=(ds4[:,0], ds4[:,1]))
+    #result4 = mini4.minimize()
 
     # generates output files
-    outputFile(args.dataSet1Name, ds1, result1)
-    outputFile(args.dataSet2Name, ds2, result2)
-    outputFile(args.dataSet3Name, ds3, result3)
-    outputFile(args.dataSet4Name, ds4, result4)
+    #outputFile(args.dataSet1Name, ds1, result1)
+    #outputFile(args.dataSet2Name, ds2, result2)
+    #outputFile(args.dataSet3Name, ds3, result3)
+    #outputFile(args.dataSet4Name, ds4, result4)
 
-    # this calls the funtion that writes teh tab delimnated file
-    EC50s = {args.dataSet1Name : result1.params.valuesdict()['EC50'], args.dataSet2Name : result2.params.valuesdict()['EC50'], args.dataSet3Name : result3.params.valuesdict()['EC50'], args.dataSet4Name : result4.params.valuesdict()['EC50']}
-    outputEC50Table(EC50s)
+    # this calls the funtion that writes the tab delimnated file
+    #EC50s = {args.dataSet1Name : result1.params.valuesdict()['EC50'], args.dataSet2Name : result2.params.valuesdict()['EC50'], args.dataSet3Name : result3.params.valuesdict()['EC50'], args.dataSet4Name : result4.params.valuesdict()['EC50']}
+    #outputEC50Table(EC50s)
 
     # generates plot and saves pdf version of plot
-    plotFits(result1, result2, result3, result4, ds1[:,0], ds1[:,1], ((ds1[:,2]/ds1[:,1])*(ds1[:,1]/result1.params.valuesdict()['max'])), ds2[:,1], ds3[:,1], ds4[:,1], ((ds2[:,2]/ds2[:,1])*(ds2[:,1]/result2.params.valuesdict()['max'])), ((ds3[:,2]/ds3[:,1])*(ds3[:,1]/result3.params.valuesdict()['max'])), ((ds4[:,2]/ds4[:,1])*(ds4[:,1]/result4.params.valuesdict()['max'])))
+    #plotFits(result1, result2, result3, result4, ds1[:,0], ds1[:,1], ((ds1[:,2]/ds1[:,1])*(ds1[:,1]/result1.params.valuesdict()['max'])), ds2[:,1], ds3[:,1], ds4[:,1], ((ds2[:,2]/ds2[:,1])*(ds2[:,1]/result2.params.valuesdict()['max'])), ((ds3[:,2]/ds3[:,1])*(ds3[:,1]/result3.params.valuesdict()['max'])), ((ds4[:,2]/ds4[:,1])*(ds4[:,1]/result4.params.valuesdict()['max'])))
