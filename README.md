@@ -57,6 +57,7 @@ You have the option of specifying several parameters for the script using flags 
 - `-s` This specifies the number of samples that the concentration gradient spans. It needs to be a number.
 - `-a` This specifies the units that the script should label the x-axis It needs to be a string.
 - `-n` This specifies whether the parameter n should be fit, or fixed. Options are `True` or `False`
+- `-m` This specifies the layout of the plate. Options are `True` (4 experiments, each with 3 replicate samples) or `False` (2 experiments, each with 4 replicate samples).
 
 For example: `python3 EC50.py -d 2 -c 1 -s 8 -a mg/mL -n False`
 
@@ -75,12 +76,15 @@ These flags do not need to be used every time that the script is run. If they ar
 | `-s` | 8 |
 | `-a` | mg/mL |
 | `-n` | False |
+| `-m` | True |
 
 For example: `python3 EC50.py -d 10 -c 1` will set the concentration gradient to be 8 samples which span 1 mg/mL to 0.00000001 mg/mL. The unspecified flags will take on their default values listed in the above table.
 
 You can run less than 8 samples if you would like. In this situation, you need to place your highest concentration samples in row A. Your lowest concentration will be placed into the corresponding row, depending on how many samples you have. You will then need to include the `-s` flag when you run the script. If you use this flag, every experiment on the plate needs to use the same number of samples. You cannot have one experiment with 8 samples, and three with only 4 samples, for example
 
 As the script does the fit for each input data file in `input/`, a new window will appear showing you the graphed data. You need to close this window for the script to proceed to the next input file.
+
+**A note on `-m`**: This switches the plate layout 2 experiments, with 4 replicates. The two experiments should be in rows (A, B, C, D) for experiment 1, and rows (E, F, G, H). The replicates for those experiments should be in the column. I.e. A1, B1, C1, D1 are the four replicates of the highest concentration sample in experiment 1... If you are using more than 8 samples in your experiments you **need** to use the `-s` flag when you execute the script, otherwise it will default to 8 sample. Your file naming scheme for you input data should look like this: `PLATENUMBER_EXPERIMENTALINFO_EXPERIMENT1_EXPERIMENT2.txt`.
 
 
 ### Output of the script
