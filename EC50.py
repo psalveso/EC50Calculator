@@ -13,8 +13,10 @@ parser.add_argument("-d", "--dilution", help="Dilution factor i.e., 2-fold, 3-fo
 parser.add_argument("-c", "--concentation", help="Highest concentration used", default=3, dest="high", type=float)
 parser.add_argument("-s", "--samples", help="Number of samples used", default=8, dest="numSamples", type=int)
 parser.add_argument("-a", "--axis", help="Units of x-axis for graphing", default="mg/mL", dest="axis")
-parser.add_argument("-n", "--hill", help="Fit Hill coefficient? True or False", default=False, dest="hill")
+parser.add_argument("--fit_hill", action='store_true', help="turns on fitting of hill coefficient", dest="hill")
+parser.add_argument("--no_fit_hill", action='store_false', help="turns off fitting of hill coefficient (default behavior)", dest="hill")
 parser.add_argument("-m", "--mode", help="$4 experiments with 3 replicates (True), or 2 experiments with 4 replicates (False)", default=True, dest="mode", type=bool)
+parser.set_defaults(hill=False)
 args = parser.parse_args()
 
 # Calculated based on user input

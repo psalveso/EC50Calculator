@@ -56,10 +56,11 @@ You have the option of specifying several parameters for the script using flags 
 - `-c` This specifies the highest concentration used in the concentration gradient. It needs to be a number.
 - `-s` This specifies the number of samples that the concentration gradient spans. It needs to be a number.
 - `-a` This specifies the units that the script should label the x-axis It needs to be a string.
-- `-n` This specifies whether the parameter n should be fit, or fixed. Options are `True` or `False`
+- `--fit_hill` This turns on fitting of the hill coefficient.
+- `--no_fit_hill` This turns off fitting of the hill coefficient. Script defaults to this.
 - `-m` This specifies the layout of the plate. Options are `True` (4 experiments, each with 3 replicate samples) or `False` (2 experiments, each with 4 replicate samples).
 
-For example: `python3 EC50.py -d 2 -c 1 -s 8 -a mg/mL -n False`
+For example: `python3 EC50.py -d 2 -c 1 -s 8 -a mg/mL --no_fit_hill` or `python3 EC50.py -d 2 -c 1 -s 8 -a mg/mL` fit with hill = 1.0. `python3 EC50.py -d 2 -c 1 -s 8 -a mg/mL --fit_hill` will fit the hill coefficient
 
 This tells the script that there are 8 samples that span from 1 mg/mL to 0.0078125 mg/mL. The fit will treat n fixed to 1. It will then label the x-axis of the output graphs with `mg/mL`,
 
@@ -75,7 +76,6 @@ These flags do not need to be used every time that the script is run. If they ar
 | `-c` | 3 |
 | `-s` | 8 |
 | `-a` | mg/mL |
-| `-n` | False |
 | `-m` | True |
 
 For example: `python3 EC50.py -d 10 -c 1` will set the concentration gradient to be 8 samples which span 1 mg/mL to 0.00000001 mg/mL. The unspecified flags will take on their default values listed in the above table.
